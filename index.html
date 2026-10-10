@@ -21,7 +21,7 @@
     <header>
       <div class="badge">Artırılmış Gerçeklik</div>
       <h1>Mobilya Stüdyosu</h1>
-      <p>Modeli çevirin veya kameranızı açıp odanıza yerleştirin.</p>
+      <p>Modeli inceleyin veya kamerayla mekanınıza yerleştirin.</p>
     </header>
 
     <div class="main-container">
@@ -33,25 +33,32 @@
           alt="Mobilya Modeli"
           ar
           ar-modes="webxr scene-viewer quick-look"
-          ar-scale="fixed"
+          ar-scale="auto"
           ar-placement="floor"
           camera-controls
           touch-action="pan-y"
-          shadow-intensity="1.6"
+          shadow-intensity="1.4"
           shadow-softness="1"
           exposure="1.05"
           auto-rotate
         >
         </model-viewer>
 
-        <!-- Her Zaman Görünür AR / Kamera Butonu -->
-        <button type="button" id="custom-ar-button" onclick="startAR()">
+        <!-- Sağ Altta Minimal Kamera Butonu -->
+        <button
+          type="button"
+          id="custom-ar-button"
+          onclick="startAR()"
+          title="Kamerada Gör"
+        >
           <svg viewBox="0 0 24 24">
             <path
-              d="M4 4h3V2H4a2 2 0 0 0-2 2v3h2V4zm16-2h-3v2h3v3h2V4a2 2 0 0 0-2-2zm-1 18h-3v2h3a2 2 0 0 0 2-2v-3h-2v3zM4 17H2v3a2 2 0 0 0 2 2h3v-2H4v-3zm8-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
+              d="M12 9a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm0 6a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5z"
+            />
+            <path
+              d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm11 16H4V7h3.83l1.83-2h4.68l1.83 2H20v12z"
             />
           </svg>
-          Gerçekte Gör (Kamerayı Aç)
         </button>
       </div>
 
@@ -72,8 +79,8 @@
             85 × 90 × 95 cm
           </div>
           <p class="description" id="product-desc">
-            Odanızda kaplayacağı alanı birebir görmek için butona dokunup
-            kameranızı zemine yöneltin.
+            Odanızda kaplayacağı alanı görmek için sağ alttaki kamera butonuna
+            dokunun. İki parmağınızla boyutu serbestçe değiştirebilirsiniz.
           </p>
         </div>
       </div>
@@ -84,28 +91,28 @@
         koltuk: {
           title: "Tekli Berjer Koltuk",
           dimensions: "85 × 90 × 95 cm",
-          desc: "Odanızda kaplayacağı alanı birebir görmek için butona dokunup kameranızı zemine yöneltin.",
+          desc: "Odanızda kaplayacağı alanı görmek için sağ alttaki kamera butonuna dokunun. İki parmağınızla boyutu serbestçe değiştirebilirsiniz.",
           glb: "models/koltuk.glb",
           usdz: "models/koltuk.usdz",
-          placement: "floor", // Zemin algılama
+          placement: "floor",
           cameraTarget: "auto auto auto",
         },
         lamba: {
-          title: "Modern Tavan / Sarkıt Lamba",
+          title: "Modern Tavan / Duvar Lambası",
           dimensions: "40 × 40 × 120 cm",
-          desc: "Tavana veya yukarı yüzeye yapışması için kameranızı yukarı/üst alana yöneltin.",
+          desc: "Kameranızı tavana veya duvara yöneltin; lamba yüzeye kilitlenir. Boyutunu parmaklarınızla ayarlayabilirsiniz.",
           glb: "models/lamba.glb",
           usdz: "models/lamba.usdz",
-          placement: "wall", // Üst/dikey yüzey algılama
-          cameraTarget: "auto 100% auto", // Üst tepe noktasından hizalama
+          placement: "wall",
+          cameraTarget: "auto 100% auto",
         },
         masa: {
           title: "Masif Yemek Masası",
           dimensions: "160 × 90 × 76 cm",
-          desc: "Salon veya yemek odanıza tam uyup uymadığını gerçek boyutlarıyla zeminde test edin.",
+          desc: "Zemine oturtup çevresinde gezinebilir, mekana göre boyutunu büyütebilir veya küçültebilirsiniz.",
           glb: "models/masa.glb",
           usdz: "models/masa.usdz",
-          placement: "floor", // Zemin algılama
+          placement: "floor",
           cameraTarget: "auto auto auto",
         },
       };
@@ -117,7 +124,6 @@
         const viewer = document.getElementById("ar-viewer");
         const item = products[key];
 
-        // Model kaynakları
         viewer.src = item.glb;
         if (item.usdz) {
           viewer.setAttribute("ios-src", item.usdz);
@@ -125,28 +131,23 @@
           viewer.removeAttribute("ios-src");
         }
 
-        // AR Zemin / Tavan Yüzey Yerleşimi Ayarı
         viewer.setAttribute("ar-placement", item.placement);
 
-        // Model odak ve hizalama noktası ayarı (lambada üst kısımdan yapışma için)
         if (item.cameraTarget) {
           viewer.setAttribute("camera-target", item.cameraTarget);
         }
 
-        // Bilgileri güncelle
         document.getElementById("product-title").innerText = item.title;
         document.getElementById("product-dimensions").innerText =
           item.dimensions;
         document.getElementById("product-desc").innerText = item.desc;
 
-        // Sekme aktifliğini güncelle
         document
           .querySelectorAll(".tab-btn")
           .forEach((btn) => btn.classList.remove("active"));
         event.target.classList.add("active");
       }
 
-      // Kamera ve AR'ı başlatan tetikleyici
       function startAR() {
         const viewer = document.getElementById("ar-viewer");
         const item = products[currentProduct];
@@ -156,13 +157,11 @@
               navigator.maxTouchPoints > 1)) &&
           !window.MSStream;
 
-        // 1. Model-viewer native AR
         if (viewer.canActivateAR) {
           viewer.activateAR();
           return;
         }
 
-        // 2. iOS Quick Look Fallback
         if (isIOS && item.usdz) {
           const fullUsdzUrl = new URL(item.usdz, window.location.href).href;
           const anchor = document.createElement("a");
@@ -173,18 +172,16 @@
           return;
         }
 
-        // 3. Android Scene Viewer Fallback
         if (/android/i.test(navigator.userAgent)) {
           const fullGlbUrl = new URL(item.glb, window.location.href).href;
-          // placement parametresini intent linkine de dinamik ekliyoruz
           const intentPlacement = item.placement === "wall" ? "wall" : "floor";
-          const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&resizable=false&plane_type=${intentPlacement}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+          const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&plane_type=${intentPlacement}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
           window.location.href = intentUrl;
           return;
         }
 
         alert(
-          "AR kamera deneyimi mobil cihazlar (iOS ve Android) içindir. Lütfen telefonunuzdan açın!",
+          "AR deneyimi mobil cihazlar içindir. Lütfen telefonunuzdan açın!",
         );
       }
     </script>

@@ -44,7 +44,7 @@
         >
         </model-viewer>
 
-        <!-- Sağ Altta Minimal Kamera Butonu -->
+        <!-- Sağ Altta Kompakt Kamera Butonu -->
         <button
           type="button"
           id="custom-ar-button"
@@ -79,8 +79,8 @@
             85 × 90 × 95 cm
           </div>
           <p class="description" id="product-desc">
-            Odanızda kaplayacağı alanı görmek için sağ alttaki kamera butonuna
-            dokunun. İki parmağınızla boyutu serbestçe değiştirebilirsiniz.
+            Odanızda görmek için kamera butonuna dokunun. Tek parmağınızla tutup
+            sürükleyebilir, iki parmakla boyutlandırabilirsiniz.
           </p>
         </div>
       </div>
@@ -91,7 +91,7 @@
         koltuk: {
           title: "Tekli Berjer Koltuk",
           dimensions: "85 × 90 × 95 cm",
-          desc: "Odanızda kaplayacağı alanı görmek için sağ alttaki kamera butonuna dokunun. İki parmağınızla boyutu serbestçe değiştirebilirsiniz.",
+          desc: "Zemine oturtup parmağınızla odada istediğiniz köşeye sürükleyebilirsiniz.",
           glb: "models/koltuk.glb",
           usdz: "models/koltuk.usdz",
           placement: "floor",
@@ -100,16 +100,16 @@
         lamba: {
           title: "Modern Tavan / Duvar Lambası",
           dimensions: "40 × 40 × 120 cm",
-          desc: "Kameranızı tavana veya duvara yöneltin; lamba yüzeye kilitlenir. Boyutunu parmaklarınızla ayarlayabilirsiniz.",
+          desc: "Kamerayı hedef yüzeye tutun. Yerleştikten sonra parmağınızla yüzey üzerinde serbestçe sürükleyebilirsiniz.",
           glb: "models/lamba.glb",
           usdz: "models/lamba.usdz",
           placement: "wall",
-          cameraTarget: "auto 100% auto",
+          cameraTarget: "0m 0m 0m",
         },
         masa: {
           title: "Masif Yemek Masası",
           dimensions: "160 × 90 × 76 cm",
-          desc: "Zemine oturtup çevresinde gezinebilir, mekana göre boyutunu büyütebilir veya küçültebilirsiniz.",
+          desc: "Zemine oturtup sürükleyebilir, etrafında yürüyerek ölçülerini test edebilirsiniz.",
           glb: "models/masa.glb",
           usdz: "models/masa.usdz",
           placement: "floor",
@@ -162,20 +162,23 @@
           return;
         }
 
+        // iOS Quick Look (Quick Look linkine serbest sürükleme ve izinleri verir)
         if (isIOS && item.usdz) {
           const fullUsdzUrl = new URL(item.usdz, window.location.href).href;
           const anchor = document.createElement("a");
           anchor.setAttribute("rel", "ar");
           anchor.appendChild(document.createElement("img"));
-          anchor.setAttribute("href", fullUsdzUrl);
+          // allowsContentScaling ve serbest gesture bayrakları
+          anchor.setAttribute("href", `${fullUsdzUrl}#allowsContentScaling=1`);
           anchor.click();
           return;
         }
 
+        // Android Scene Viewer (plane_type ve serbest sürükleme parametreleri)
         if (/android/i.test(navigator.userAgent)) {
           const fullGlbUrl = new URL(item.glb, window.location.href).href;
           const intentPlacement = item.placement === "wall" ? "wall" : "floor";
-          const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&plane_type=${intentPlacement}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+          const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&plane_type=${intentPlacement}&enable_horizontal_drag=true#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
           window.location.href = intentUrl;
           return;
         }

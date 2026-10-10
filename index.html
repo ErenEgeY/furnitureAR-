@@ -87,20 +87,26 @@
           desc: "Odanızda kaplayacağı alanı birebir görmek için butona dokunup kameranızı zemine yöneltin.",
           glb: "models/koltuk.glb",
           usdz: "models/koltuk.usdz",
+          placement: "floor", // Zemin algılama
+          cameraTarget: "auto auto auto",
         },
         lamba: {
-          title: "Modern Lambader",
-          dimensions: "40 × 40 × 150 cm",
-          desc: "Köşe aydınlatması olarak yüksekliğini ve alan hissini odanızda canlı test edin.",
+          title: "Modern Tavan / Sarkıt Lamba",
+          dimensions: "40 × 40 × 120 cm",
+          desc: "Tavana veya yukarı yüzeye yapışması için kameranızı yukarı/üst alana yöneltin.",
           glb: "models/lamba.glb",
           usdz: "models/lamba.usdz",
+          placement: "wall", // Üst/dikey yüzey algılama
+          cameraTarget: "auto 100% auto", // Üst tepe noktasından hizalama
         },
         masa: {
           title: "Masif Yemek Masası",
           dimensions: "160 × 90 × 76 cm",
-          desc: "Salon veya yemek odanıza tam uyup uymadığını gerçek boyutlarıyla yerinde görün.",
+          desc: "Salon veya yemek odanıza tam uyup uymadığını gerçek boyutlarıyla zeminde test edin.",
           glb: "models/masa.glb",
           usdz: "models/masa.usdz",
+          placement: "floor", // Zemin algılama
+          cameraTarget: "auto auto auto",
         },
       };
 
@@ -111,6 +117,7 @@
         const viewer = document.getElementById("ar-viewer");
         const item = products[key];
 
+        // Model kaynakları
         viewer.src = item.glb;
         if (item.usdz) {
           viewer.setAttribute("ios-src", item.usdz);
@@ -118,18 +125,28 @@
           viewer.removeAttribute("ios-src");
         }
 
+        // AR Zemin / Tavan Yüzey Yerleşimi Ayarı
+        viewer.setAttribute("ar-placement", item.placement);
+
+        // Model odak ve hizalama noktası ayarı (lambada üst kısımdan yapışma için)
+        if (item.cameraTarget) {
+          viewer.setAttribute("camera-target", item.cameraTarget);
+        }
+
+        // Bilgileri güncelle
         document.getElementById("product-title").innerText = item.title;
         document.getElementById("product-dimensions").innerText =
           item.dimensions;
         document.getElementById("product-desc").innerText = item.desc;
 
+        // Sekme aktifliğini güncelle
         document
           .querySelectorAll(".tab-btn")
           .forEach((btn) => btn.classList.remove("active"));
         event.target.classList.add("active");
       }
 
-      // Kamera ve AR'ı zorla başlatan evrensel tetikleyici
+      // Kamera ve AR'ı başlatan tetikleyici
       function startAR() {
         const viewer = document.getElementById("ar-viewer");
         const item = products[currentProduct];
@@ -139,13 +156,13 @@
               navigator.maxTouchPoints > 1)) &&
           !window.MSStream;
 
-        // 1. Model-viewer'ın kendi AR fonksiyonu hazırsa çalıştır
+        // 1. Model-viewer native AR
         if (viewer.canActivateAR) {
           viewer.activateAR();
           return;
         }
 
-        // 2. iOS (iPhone/iPad Quick Look) doğrudan kamera fallback
+        // 2. iOS Quick Look Fallback
         if (isIOS && item.usdz) {
           const fullUsdzUrl = new URL(item.usdz, window.location.href).href;
           const anchor = document.createElement("a");
@@ -156,17 +173,18 @@
           return;
         }
 
-        // 3. Android (Google Scene Viewer) doğrudan kamera intent'i
+        // 3. Android Scene Viewer Fallback
         if (/android/i.test(navigator.userAgent)) {
           const fullGlbUrl = new URL(item.glb, window.location.href).href;
-          const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&resizable=false#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+          // placement parametresini intent linkine de dinamik ekliyoruz
+          const intentPlacement = item.placement === "wall" ? "wall" : "floor";
+          const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&resizable=false&plane_type=${intentPlacement}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
           window.location.href = intentUrl;
           return;
         }
 
-        // Bilgisayardan tıklandıysa
         alert(
-          "AR kamera deneyimi mobil cihazlar (iOS ve Android) içindir. Lütfen sayfayı telefonunuzla açın!",
+          "AR kamera deneyimi mobil cihazlar (iOS ve Android) içindir. Lütfen telefonunuzdan açın!",
         );
       }
     </script>

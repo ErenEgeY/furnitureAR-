@@ -1,115 +1,205 @@
+:root {
+  --bg: #0d0f12;
+  --card-bg: rgba(26, 29, 36, 0.75);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-main: #f8f9fa;
+  --text-muted: #8b92a0;
+  --radius-lg: 32px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto,
+    sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background-color: #f7f7f8;
-  color: #1a1a1a;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(60, 68, 85, 0.25) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(30, 35, 45, 0.3) 0px, transparent 50%);
+  color: var(--text-main);
   display: flex;
   flex-direction: column;
+  align-items: center;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 header {
-  padding: 1.25rem 1rem 0.5rem;
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem 1.25rem 1rem;
   text-align: center;
 }
 
-header h1 {
-  font-size: 1.35rem;
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   font-weight: 700;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+}
+
+header h1 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 header p {
   font-size: 0.85rem;
-  color: #666;
-  margin-top: 0.25rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
 }
 
-.viewer-container {
-  flex: 1;
+.main-container {
+  width: 100%;
+  max-width: 480px;
+  padding: 0 1.25rem 2.5rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 1rem;
+  gap: 1.25rem;
+}
+
+/* 3D Sahne Kutusu */
+.viewer-wrapper {
+  position: relative;
+  width: 100%;
+  height: 52vh;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(circle at 50% 50%, #1e222a 0%, #14171d 100%);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
 }
 
 model-viewer {
   width: 100%;
-  max-width: 500px;
-  height: 52vh;
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  position: relative;
+  height: 100%;
   --poster-color: transparent;
 }
 
-#ar-button {
-  background: #111;
-  color: #fff;
-  border-radius: 30px;
-  border: none;
+/* Her Zaman Gözüken AR Butonu */
+#custom-ar-button {
   position: absolute;
-  bottom: 16px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 12px 24px;
+  background: #ffffff;
+  color: #0b0d10;
+  border: none;
+  border-radius: 999px;
+  padding: 15px 28px;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  display: flex;
+  display: flex !important;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.4);
+  z-index: 99;
+  white-space: nowrap;
+  transition:
+    transform 0.15s ease,
+    background-color 0.2s ease;
 }
 
-#ar-button:active {
-  transform: translateX(-50%) scale(0.97);
+#custom-ar-button svg {
+  width: 20px;
+  height: 20px;
+  fill: #0b0d10;
 }
 
-.product-card {
-  width: 100%;
-  max-width: 500px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 1.25rem;
-  margin-top: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+#custom-ar-button:active {
+  transform: translateX(-50%) scale(0.95);
+  background: #e2e8f0;
+}
+
+/* Kontrol Kartı */
+.controls-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Kategori Butonları */
+.product-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 6px;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.tab-btn {
+  padding: 12px 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* Bilgi Alanı */
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .product-info h2 {
-  font-size: 1.15rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }
 
-.product-info .specs {
-  font-size: 0.85rem;
-  color: #777;
-  margin-top: 4px;
-}
-
-.variant-picker {
-  display: flex;
-  gap: 8px;
-  margin-top: 1rem;
-}
-
-.variant-picker button {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  background: #fff;
+.dimensions-pill {
+  align-self: flex-start;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
   border-radius: 8px;
-  font-size: 0.85rem;
-  cursor: pointer;
+  margin: 4px 0 6px;
+  font-family: monospace;
 }
 
-.variant-picker button.active {
-  border-color: #111;
-  background: #111;
-  color: #fff;
+.product-info .description {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.55;
 }

@@ -1,73 +1,174 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobilya AR Kataloğu</title>
-  
-  <!-- Model Viewer Script -->
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Mobilya AR Kataloğu</title>
 
-  <header>
-    <h1>Modern Koltuk Koleksiyonu</h1>
-    <p>Modeli çevirip inceleyin veya odanızda deneyin.</p>
-  </header>
+    <!-- Google Model Viewer -->
+    <script
+      type="module"
+      src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"
+    ></script>
 
-  <main class="viewer-container">
-    <model-viewer 
-      id="furniture-viewer"
-      src="models/koltuk.glb" 
-      ios-src="models/koltuk.usdz"
-      alt="Modern Konfor Koltuk"
-      ar 
-      ar-modes="webxr scene-viewer quick-look" 
-      ar-scale="fixed"
-      camera-controls 
-      touch-action="pan-y"
-      shadow-intensity="1.5"
-      shadow-softness="1"
-      exposure="1"
-      auto-rotate>
-      
-      <!-- Özel AR Butonu -->
-      <button slot="ar-button" id="ar-button">
-        Odanızda Görün (AR)
-      </button>
+    <!-- Harici CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="badge">Artırılmış Gerçeklik</div>
+      <h1>Mobilya Stüdyosu</h1>
+      <p>Modeli çevirin veya kameranızı açıp odanıza yerleştirin.</p>
+    </header>
 
-      <div id="ar-prompt">
-        <span>Cihazınızı zemine doğru tutun</span>
+    <div class="main-container">
+      <div class="viewer-wrapper">
+        <model-viewer
+          id="ar-viewer"
+          src="models/koltuk.glb"
+          ios-src="models/koltuk.usdz"
+          alt="Mobilya Modeli"
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          ar-scale="fixed"
+          ar-placement="floor"
+          camera-controls
+          touch-action="pan-y"
+          shadow-intensity="1.6"
+          shadow-softness="1"
+          exposure="1.05"
+          auto-rotate
+        >
+        </model-viewer>
+
+        <!-- Her Zaman Görünür AR / Kamera Butonu -->
+        <button type="button" id="custom-ar-button" onclick="startAR()">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M4 4h3V2H4a2 2 0 0 0-2 2v3h2V4zm16-2h-3v2h3v3h2V4a2 2 0 0 0-2-2zm-1 18h-3v2h3a2 2 0 0 0 2-2v-3h-2v3zM4 17H2v3a2 2 0 0 0 2 2h3v-2H4v-3zm8-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
+            />
+          </svg>
+          Gerçekte Gör (Kamerayı Aç)
+        </button>
       </div>
-    </model-viewer>
 
-    <!-- Ürün Detay & Seçim Alanı -->
-    <div class="product-card">
-      <div class="product-info">
-        <h2>Lüks Kadife Berjer</h2>
-        <p class="specs">Boyutlar: 85cm x 90cm x 95cm</p>
-      </div>
-      
-      <!-- Çoklu ürün için dinamik model değiştirme butonları -->
-      <div class="variant-picker">
-        <button class="active" onclick="changeModel('models/koltuk.glb', 'models/koltuk.usdz', 'Lüks Kadife Berjer')">Gri Model</button>
-        <button onclick="changeModel('models/koltuk-yesil.glb', 'models/koltuk-yesil.usdz', 'Zümrüt Yeşil Berjer')">Yeşil Model</button>
+      <div class="controls-card">
+        <div class="product-tabs">
+          <button class="tab-btn active" onclick="selectProduct('koltuk')">
+            Koltuk
+          </button>
+          <button class="tab-btn" onclick="selectProduct('lamba')">
+            Lamba
+          </button>
+          <button class="tab-btn" onclick="selectProduct('masa')">Masa</button>
+        </div>
+
+        <div class="product-info">
+          <h2 id="product-title">Tekli Berjer Koltuk</h2>
+          <div class="dimensions-pill" id="product-dimensions">
+            85 × 90 × 95 cm
+          </div>
+          <p class="description" id="product-desc">
+            Odanızda kaplayacağı alanı birebir görmek için butona dokunup
+            kameranızı zemine yöneltin.
+          </p>
+        </div>
       </div>
     </div>
-  </main>
 
-  <script>
-    function changeModel(glbUrl, usdzUrl, title) {
-      const viewer = document.getElementById('furniture-viewer');
-      viewer.src = glbUrl;
-      if (usdzUrl) viewer.setAttribute('ios-src', usdzUrl);
-      document.querySelector('.product-info h2').innerText = title;
-      
-      // Aktif buton stilini güncelle
-      document.querySelectorAll('.variant-picker button').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-    }
-  </script>
-</body>
+    <script>
+      const products = {
+        koltuk: {
+          title: "Tekli Berjer Koltuk",
+          dimensions: "85 × 90 × 95 cm",
+          desc: "Odanızda kaplayacağı alanı birebir görmek için butona dokunup kameranızı zemine yöneltin.",
+          glb: "models/koltuk.glb",
+          usdz: "models/koltuk.usdz",
+        },
+        lamba: {
+          title: "Modern Lambader",
+          dimensions: "40 × 40 × 150 cm",
+          desc: "Köşe aydınlatması olarak yüksekliğini ve alan hissini odanızda canlı test edin.",
+          glb: "models/lamba.glb",
+          usdz: "models/lamba.usdz",
+        },
+        masa: {
+          title: "Masif Yemek Masası",
+          dimensions: "160 × 90 × 76 cm",
+          desc: "Salon veya yemek odanıza tam uyup uymadığını gerçek boyutlarıyla yerinde görün.",
+          glb: "models/masa.glb",
+          usdz: "models/masa.usdz",
+        },
+      };
+
+      let currentProduct = "koltuk";
+
+      function selectProduct(key) {
+        currentProduct = key;
+        const viewer = document.getElementById("ar-viewer");
+        const item = products[key];
+
+        viewer.src = item.glb;
+        if (item.usdz) {
+          viewer.setAttribute("ios-src", item.usdz);
+        } else {
+          viewer.removeAttribute("ios-src");
+        }
+
+        document.getElementById("product-title").innerText = item.title;
+        document.getElementById("product-dimensions").innerText =
+          item.dimensions;
+        document.getElementById("product-desc").innerText = item.desc;
+
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+      }
+
+      // Kamera ve AR'ı zorla başlatan evrensel tetikleyici
+      function startAR() {
+        const viewer = document.getElementById("ar-viewer");
+        const item = products[currentProduct];
+        const isIOS =
+          (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" &&
+              navigator.maxTouchPoints > 1)) &&
+          !window.MSStream;
+
+        // 1. Model-viewer'ın kendi AR fonksiyonu hazırsa çalıştır
+        if (viewer.canActivateAR) {
+          viewer.activateAR();
+          return;
+        }
+
+        // 2. iOS (iPhone/iPad Quick Look) doğrudan kamera fallback
+        if (isIOS && item.usdz) {
+          const fullUsdzUrl = new URL(item.usdz, window.location.href).href;
+          const anchor = document.createElement("a");
+          anchor.setAttribute("rel", "ar");
+          anchor.appendChild(document.createElement("img"));
+          anchor.setAttribute("href", fullUsdzUrl);
+          anchor.click();
+          return;
+        }
+
+        // 3. Android (Google Scene Viewer) doğrudan kamera intent'i
+        if (/android/i.test(navigator.userAgent)) {
+          const fullGlbUrl = new URL(item.glb, window.location.href).href;
+          const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&resizable=false#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+          window.location.href = intentUrl;
+          return;
+        }
+
+        // Bilgisayardan tıklandıysa
+        alert(
+          "AR kamera deneyimi mobil cihazlar (iOS ve Android) içindir. Lütfen sayfayı telefonunuzla açın!",
+        );
+      }
+    </script>
+  </body>
 </html>

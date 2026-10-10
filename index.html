@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobilya AR Kataloğu</title>
+  
+  <!-- Model Viewer Script -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Modern Koltuk Koleksiyonu</h1>
+    <p>Modeli çevirip inceleyin veya odanızda deneyin.</p>
+  </header>
+
+  <main class="viewer-container">
+    <model-viewer 
+      id="furniture-viewer"
+      src="models/koltuk.glb" 
+      ios-src="models/koltuk.usdz"
+      alt="Modern Konfor Koltuk"
+      ar 
+      ar-modes="webxr scene-viewer quick-look" 
+      ar-scale="fixed"
+      camera-controls 
+      touch-action="pan-y"
+      shadow-intensity="1.5"
+      shadow-softness="1"
+      exposure="1"
+      auto-rotate>
+      
+      <!-- Özel AR Butonu -->
+      <button slot="ar-button" id="ar-button">
+        Odanızda Görün (AR)
+      </button>
+
+      <div id="ar-prompt">
+        <span>Cihazınızı zemine doğru tutun</span>
+      </div>
+    </model-viewer>
+
+    <!-- Ürün Detay & Seçim Alanı -->
+    <div class="product-card">
+      <div class="product-info">
+        <h2>Lüks Kadife Berjer</h2>
+        <p class="specs">Boyutlar: 85cm x 90cm x 95cm</p>
+      </div>
+      
+      <!-- Çoklu ürün için dinamik model değiştirme butonları -->
+      <div class="variant-picker">
+        <button class="active" onclick="changeModel('models/koltuk.glb', 'models/koltuk.usdz', 'Lüks Kadife Berjer')">Gri Model</button>
+        <button onclick="changeModel('models/koltuk-yesil.glb', 'models/koltuk-yesil.usdz', 'Zümrüt Yeşil Berjer')">Yeşil Model</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function changeModel(glbUrl, usdzUrl, title) {
+      const viewer = document.getElementById('furniture-viewer');
+      viewer.src = glbUrl;
+      if (usdzUrl) viewer.setAttribute('ios-src', usdzUrl);
+      document.querySelector('.product-info h2').innerText = title;
+      
+      // Aktif buton stilini güncelle
+      document.querySelectorAll('.variant-picker button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

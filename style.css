@@ -88,13 +88,30 @@ header p {
   overflow: hidden;
 }
 
+/* Sayfayı ve Dokunmayı Asla Engellemeyen Üst Yükleme Çizgisi */
+.loader-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #d8cfc3, #ffffff);
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    width 0.2s ease,
+    opacity 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
 model-viewer {
   width: 100%;
   height: 100%;
   --poster-color: transparent;
 }
 
-/* Sağ Üst Köşedeki Entegre AR Butonu */
+/* Sağ Üst AR Butonu */
 #ar-launch-button {
   position: absolute;
   top: 16px;
@@ -102,10 +119,10 @@ model-viewer {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(24, 26, 32, 0.65);
+  background: rgba(24, 26, 32, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: var(--warm-accent);
   padding: 8px 14px;
   border-radius: 999px;
@@ -132,66 +149,6 @@ model-viewer {
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.3px;
-}
-
-/* Yükleme Ekranı Overlay */
-.loader-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(18, 19, 22, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  z-index: 20;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.loader-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--warm-accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-#progress-bar-container {
-  width: 140px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-#progress-bar {
-  width: 0%;
-  height: 100%;
-  background: var(--warm-accent);
-  transition: width 0.15s ease;
-}
-
-#loader-text {
-  font-size: 0.74rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
 }
 
 /* Kontrol Kartı */

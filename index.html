@@ -25,10 +25,17 @@
     </header>
 
     <main class="main-container">
-      <!-- 3D Sahne Konteyneri -->
       <div class="viewer-wrapper">
-        <!-- Sağ Üstte Konumlandırılmış Minimal AR Butonu -->
-        <button type="button" id="ar-launch-button" aria-label="Mekanda Gör">
+        <!-- İnce, Akıcı Üst Yükleme Çizgisi (Ekranı Kilitlemez) -->
+        <div id="loader-line" class="loader-line"></div>
+
+        <!-- Sağ Üstte Minimal AR Butonu -->
+        <button
+          type="button"
+          id="ar-launch-button"
+          onclick="startAR()"
+          title="Mekanda Gör"
+        >
           <svg viewBox="0 0 24 24" class="ar-icon">
             <path
               d="M4 4h3V2H4a2 2 0 0 0-2 2v3h2V4zm16-2h-3v2h3v3h2V4a2 2 0 0 0-2-2zm-1 18h-3v2h3a2 2 0 0 0 2-2v-3h-2v3zM4 17H2v3a2 2 0 0 0 2 2h3v-2H4v-3zm8-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
@@ -37,16 +44,7 @@
           <span class="ar-label">AR'da Gör</span>
         </button>
 
-        <!-- Yükleniyor Göstergesi (Loader & Progress) -->
-        <div id="loader" class="loader-overlay active">
-          <div class="spinner"></div>
-          <div id="progress-bar-container">
-            <div id="progress-bar"></div>
-          </div>
-          <span id="loader-text">Model Yükleniyor...</span>
-        </div>
-
-        <!-- Optimize Edilmiş Model Viewer -->
+        <!-- 3D Model Sahnesi -->
         <model-viewer
           id="ar-viewer"
           src="models/koltuk.glb"
@@ -59,22 +57,27 @@
           camera-controls
           touch-action="pan-y"
           shadow-intensity="0.8"
-          shadow-softness="0.5"
+          shadow-softness="0.4"
           exposure="1"
-          loading="lazy"
+          loading="eager"
           reveal="auto"
-          power-preference="high-performance"
         >
         </model-viewer>
       </div>
 
-      <!-- Ürün Kontrol & Detay Paneli -->
+      <!-- Ürün Kontrol Paneli -->
       <section class="controls-card">
-        <nav class="product-tabs" role="tablist">
-          <button class="tab-btn active" data-product="koltuk">Berjer</button>
-          <button class="tab-btn" data-product="koltukT">Koltuk T.</button>
-          <button class="tab-btn" data-product="lamba">Lamba</button>
-          <button class="tab-btn" data-product="masa">Masa</button>
+        <nav class="product-tabs">
+          <button class="tab-btn active" onclick="selectProduct('koltuk')">
+            Berjer
+          </button>
+          <button class="tab-btn" onclick="selectProduct('koltukT')">
+            Koltuk T.
+          </button>
+          <button class="tab-btn" onclick="selectProduct('lamba')">
+            Lamba
+          </button>
+          <button class="tab-btn" onclick="selectProduct('masa')">Masa</button>
         </nav>
 
         <article class="product-info">
@@ -91,8 +94,7 @@
     </main>
 
     <script>
-      // Ürün Kataloğu Veri Konfigürasyonu
-      const PRODUCT_CATALOG = {
+      const products = {
         koltuk: {
           title: "Tekli Berjer Koltuk",
           dimensions: "85 × 90 × 95 cm",
@@ -123,48 +125,34 @@
         },
       };
 
-      // State Yönetimi
-      let activeKey = "koltuk";
-      let isSwitching = false;
-
-      // DOM Referansları
+      let currentProduct = "koltuk";
       const viewer = document.getElementById("ar-viewer");
-      const launchBtn = document.getElementById("ar-launch-button");
-      const loader = document.getElementById("loader");
-      const progressBar = document.getElementById("progress-bar");
-      const loaderText = document.getElementById("loader-text");
-      const titleEl = document.getElementById("product-title");
-      const dimsEl = document.getElementById("product-dimensions");
-      const descEl = document.getElementById("product-desc");
-      const tabs = document.querySelectorAll(".tab-btn");
+      const loaderLine = document.getElementById("loader-line");
 
-      // Model Yükleme İlerlemesi (Network Takibi)
+      // Model Yükleme İlerlemesi (Yalnızca üstteki ince çizgiyi yönetir, dokunmayı ASLA engellemez)
       viewer.addEventListener("progress", (e) => {
-        const percentage = Math.round(e.detail.totalProgress * 100);
-        progressBar.style.width = `${percentage}%`;
-        loaderText.innerText = `%${percentage} Yüklendi`;
+        const progress = e.detail.totalProgress;
+        loaderLine.style.opacity = "1";
+        loaderLine.style.width = progress * 100 + "%";
       });
 
-      // Model Tam Yüklendiğinde
       viewer.addEventListener("load", () => {
-        loader.classList.remove("active");
-        progressBar.style.width = "0%";
-        isSwitching = false;
+        loaderLine.style.width = "100%";
+        setTimeout(() => {
+          loaderLine.style.opacity = "0";
+          loaderLine.style.width = "0%";
+        }, 250);
       });
 
-      // Model Değiştirme Fonksiyonu
-      function switchProduct(key) {
-        if (key === activeKey || isSwitching) return;
-        isSwitching = true;
-        activeKey = key;
+      function selectProduct(key) {
+        if (key === currentProduct) return;
+        currentProduct = key;
+        const item = products[key];
 
-        const item = PRODUCT_CATALOG[key];
+        // Yeni modeli ata (model viewer eskiyi gösterirken yeniyi arka planda indirir)
+        loaderLine.style.opacity = "1";
+        loaderLine.style.width = "20%";
 
-        // Loader'ı aktif et
-        loader.classList.add("active");
-        loaderText.innerText = "Yükleniyor...";
-
-        // Model kaynaklarını güncelle
         viewer.src = item.glb;
         if (item.usdz) {
           viewer.setAttribute("ios-src", item.usdz);
@@ -172,28 +160,21 @@
           viewer.removeAttribute("ios-src");
         }
 
-        // UI Metinlerini Güncelle
-        titleEl.innerText = item.title;
-        dimsEl.innerText = item.dimensions;
-        descEl.innerText = item.desc;
+        // UI metinlerini hemen güncelle
+        document.getElementById("product-title").innerText = item.title;
+        document.getElementById("product-dimensions").innerText =
+          item.dimensions;
+        document.getElementById("product-desc").innerText = item.desc;
 
-        // Sekmeleri Güncelle
-        tabs.forEach((tab) => {
-          tab.classList.toggle("active", tab.dataset.product === key);
-        });
+        // Sekme aktifliğini anında güncelle
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
       }
 
-      // Sekme Dinleyicileri (Event Delegation)
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", (e) => {
-          const productKey = e.currentTarget.dataset.product;
-          switchProduct(productKey);
-        });
-      });
-
-      // Evrensel AR Başlatıcı (iOS QuickLook & Android Scene Viewer)
-      launchBtn.addEventListener("click", () => {
-        const item = PRODUCT_CATALOG[activeKey];
+      function startAR() {
+        const item = products[currentProduct];
         const isIOS =
           (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
             (navigator.platform === "MacIntel" &&
@@ -223,9 +204,9 @@
         }
 
         alert(
-          "AR deneyimi mobil cihazlar içindir. Lütfen sayfayı telefonunuzdan açın.",
+          "AR deneyimi mobil cihazlar içindir. Lütfen telefonunuzdan açın!",
         );
-      });
+      }
     </script>
   </body>
 </html>

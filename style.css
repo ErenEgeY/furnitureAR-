@@ -184,6 +184,41 @@ model-viewer {
   color: #ffffff;
 }
 
+/* Ürün Sekmeleri (4'lü Buton Izgarası) */
+.product-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: rgba(14, 15, 18, 0.4);
+  padding: 5px;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.tab-btn {
+  padding: 10px 4px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
 .dimensions-pill {
   align-self: flex-start;
   font-size: 0.75rem;

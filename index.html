@@ -1,437 +1,155 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
-    />
-    <title>Bella Pizza & AR Menü</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Mobilya AR Kataloğu</title>
 
-    <!-- Google Model Viewer -->
-    <script
-      type="module"
-      src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"
-    ></script>
+  <!-- Google Model Viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
-    <style>
-      :root {
-        --primary: #ff5722;
-        --bg: #121214;
-        --card-bg: #1e1e24;
-        --text-muted: #9e9ea7;
-      }
+  <!-- Harici CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        -webkit-tap-highlight-color: transparent;
-      }
+  <header>
+    <div class="badge">Artırılmış Gerçeklik</div>
+    <h1>Mobilya Stüdyosu</h1>
+    <p>Modeli inceleyin veya kamerayla mekanınıza yerleştirin.</p>
+  </header>
 
-      body {
-        background-color: var(--bg);
-        color: #ffffff;
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-bottom: 40px;
-      }
-
-      header {
-        width: 100%;
-        max-width: 480px;
-        padding: 20px 20px 10px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .brand {
-        font-size: 22px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-      }
-
-      .brand span {
-        color: var(--primary);
-      }
-
-      .table-badge {
-        font-size: 12px;
-        background: rgba(255, 87, 34, 0.15);
-        color: var(--primary);
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-weight: 600;
-        border: 1px solid rgba(255, 87, 34, 0.3);
-      }
-
-      /* 3D Model Vitrini */
-      #viewer-container {
-        width: 90%;
-        max-width: 420px;
-        height: 310px;
-        background: radial-gradient(
-          circle,
-          rgba(255, 255, 255, 0.06) 0%,
-          rgba(0, 0, 0, 0.6) 100%
-        );
-        border-radius: 28px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        position: relative;
-        margin-top: 8px;
-        overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      }
-
-      model-viewer {
-        width: 100%;
-        height: 100%;
-        outline: none;
-        --poster-color: transparent;
-      }
-
-      /* Ürün Detayları */
-      #active-info {
-        width: 90%;
-        max-width: 420px;
-        margin-top: 14px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
-
-      .info-left h2 {
-        font-size: 19px;
-        font-weight: 700;
-      }
-
-      .info-left p {
-        font-size: 13px;
-        color: var(--text-muted);
-        margin-top: 4px;
-        max-width: 270px;
-        line-height: 1.35;
-      }
-
-      .info-price {
-        font-size: 20px;
-        font-weight: 800;
-        color: var(--primary);
-        white-space: nowrap;
-      }
-
-      /* AR Tetikleyici Butonu */
-      #ar-trigger {
-        width: 90%;
-        max-width: 420px;
-        background: var(--primary);
-        color: #fff;
-        border: none;
-        border-radius: 18px;
-        padding: 14px 20px;
-        margin-top: 14px;
-        font-size: 15px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        cursor: pointer;
-        box-shadow: 0 8px 24px rgba(255, 87, 34, 0.35);
-        transition: transform 0.15s ease;
-      }
-
-      #ar-trigger:active {
-        transform: scale(0.97);
-      }
-
-      /* Kategori Butonları */
-      .categories {
-        width: 90%;
-        max-width: 420px;
-        display: flex;
-        gap: 8px;
-        margin-top: 22px;
-        overflow-x: auto;
-        padding-bottom: 2px;
-      }
-
-      .categories::-webkit-scrollbar {
-        display: none;
-      }
-
-      .cat-btn {
-        padding: 8px 16px;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: var(--card-bg);
-        color: #bbb;
-        font-size: 13px;
-        font-weight: 600;
-        white-space: nowrap;
-        cursor: pointer;
-      }
-
-      .cat-btn.active {
-        background: #fff;
-        color: #000;
-        border-color: #fff;
-      }
-
-      /* Menü Kartları Listesi */
-      .menu-list {
-        width: 90%;
-        max-width: 420px;
-        margin-top: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .menu-item {
-        background: var(--card-bg);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 16px;
-        padding: 14px 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        transition:
-          border-color 0.2s ease,
-          background 0.2s ease,
-          transform 0.15s ease;
-      }
-
-      .menu-item:active {
-        transform: scale(0.98);
-      }
-
-      .menu-item.active {
-        border-color: var(--primary);
-        background: linear-gradient(
-          90deg,
-          rgba(255, 87, 34, 0.12) 0%,
-          rgba(30, 30, 36, 1) 100%
-        );
-      }
-
-      .item-text h4 {
-        font-size: 15px;
-        font-weight: 600;
-      }
-
-      .item-text span {
-        font-size: 12px;
-        color: var(--text-muted);
-        display: block;
-        margin-top: 2px;
-      }
-
-      .item-price {
-        font-size: 15px;
-        font-weight: 700;
-        color: #eee;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <div class="brand">Bella <span>Pizza</span></div>
-      <div class="table-badge">AR Görünüm</div>
-    </header>
-
-    <!-- 3D Model Vitrini -->
-    <div id="viewer-container">
+  <div class="main-container">
+    <div class="viewer-wrapper">
       <model-viewer
-        id="main-viewer"
-        src="assets/urun2.glb"
-        ios-src="assets/urun2.usdz"
+        id="ar-viewer"
+        src="models/koltuk.glb"
+        ios-src="models/koltuk.usdz"
+        alt="Mobilya Modeli"
         ar
         ar-modes="webxr scene-viewer quick-look"
+        ar-scale="auto"
         ar-placement="floor"
         camera-controls
-        auto-rotate
-        rotation-per-second="25deg"
-        shadow-intensity="1.5"
-        shadow-softness="0.5"
-        orientation="0deg 0deg 0deg"
-      >
+        touch-action="pan-y"
+        shadow-intensity="1.4"
+        shadow-softness="1"
+        exposure="1.05"
+        auto-rotate>
       </model-viewer>
+
+      <!-- Sağ Altta Kompakt Kamera Butonu -->
+      <button type="button" id="custom-ar-button" onclick="startAR()" title="Kamerada Gör">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 9a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm0 6a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5z"/>
+          <path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm11 16H4V7h3.83l1.83-2h4.68l1.83 2H20v12z"/>
+        </svg>
+      </button>
     </div>
 
-    <!-- Ürün Detay Bilgisi -->
-    <div id="active-info">
-      <div class="info-left">
-        <h2 id="title-display">Karışık İtalyan Pizza</h2>
-        <p id="desc-display">
-          Mozzarella, mantar, biber, sucuk ve özel fesleğenli domates sosu.
-        </p>
+    <div class="controls-card">
+      <div class="product-tabs">
+        <button class="tab-btn active" onclick="selectProduct('koltuk')">Berjer</button>
+        <button class="tab-btn" onclick="selectProduct('koltukT')">Koltuk Takımı</button>
+        <button class="tab-btn" onclick="selectProduct('lamba')">Lamba</button>
+        <button class="tab-btn" onclick="selectProduct('masa')">Masa</button>
       </div>
-      <div class="info-price" id="price-display">320 ₺</div>
+
+      <div class="product-info">
+        <h2 id="product-title">Tekli Berjer Koltuk</h2>
+        <div class="dimensions-pill" id="product-dimensions">85 × 90 × 95 cm</div>
+        <p class="description" id="product-desc">Odanızda kaplayacağı alanı görmek için sağ alttaki kamera butonuna dokunun. Tek parmağınızla serbestçe sürükleyip taşıyabilirsiniz.</p>
+      </div>
     </div>
+  </div>
 
-    <!-- Doğrudan AR Başlat Butonu -->
-    <button id="ar-trigger" onclick="handleARLaunch()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path
-          d="M3 4c0-1.1.9-2 2-2h4v2H5v4H3V4zm0 16v-4h2v4h4v2H5c-1.1 0-2-.9-2-2zm18 0c0 1.1-.9 2-2 2h-4v-2h4v-4h2v4zM21 4v4h-2V4h-4V2h4c1.1 0 2 .9 2 2zM12 8l-5 3v6l5 3 5-3v-6l-5-3zm0 2.2 3.3 1.8L12 13.8 8.7 12 12 10.2z"
-        />
-      </svg>
-      Mekanda / Yerde 3D İncele
-    </button>
+  <script>
+    const products = {
+      koltuk: {
+        title: "Tekli Berjer Koltuk",
+        dimensions: "85 × 90 × 95 cm",
+        desc: "Zemine oturtup parmağınızla odada istediğiniz köşeye sürükleyebilirsiniz.",
+        glb: "models/koltuk.glb",
+        usdz: "models/koltuk.usdz"
+      },
+      koltukT: {
+        title: "Modüler Koltuk Takımı",
+        dimensions: "230 × 95 × 85 cm",
+        desc: "Salonunuzun zeminine tam oturur. Kaplayacağı gerçek hacmi ve yürüyüş payını test edin.",
+        glb: "models/koltukT.glb",
+        usdz: "models/koltukT.usdz"
+      },
+      lamba: {
+        title: "Modern Lamba",
+        dimensions: "40 × 40 × 120 cm",
+        desc: "Doğru dik açısıyla yerleşir. Tek parmağınızla tutup odanın her yerine rahatça sürükleyebilirsiniz.",
+        glb: "models/lamba.glb",
+        usdz: "models/lamba.usdz"
+      },
+      masa: {
+        title: "Masif Yemek Masası",
+        dimensions: "160 × 90 × 76 cm",
+        desc: "Zemine oturtup sürükleyebilir, etrafında yürüyerek ölçülerini test edebilirsiniz.",
+        glb: "models/masa.glb",
+        usdz: "models/masa.usdz"
+      }
+    };
 
-    <!-- Kategori Seçici -->
-    <div class="categories">
-      <button class="cat-btn active" onclick="filterCategory('all', this)">
-        Tümü
-      </button>
-      <button class="cat-btn" onclick="filterCategory('pizza', this)">
-        Pizzalar
-      </button>
-      <button class="cat-btn" onclick="filterCategory('burger', this)">
-        Burgerler
-      </button>
-      <button class="cat-btn" onclick="filterCategory('makarna', this)">
-        Makarnalar
-      </button>
-      <button class="cat-btn" onclick="filterCategory('mobilya', this)">
-        Mobilya
-      </button>
-    </div>
+    let currentProduct = 'koltuk';
 
-    <!-- Dinamik Menü Listesi -->
-    <div class="menu-list" id="items-container"></div>
+    function selectProduct(key) {
+      currentProduct = key;
+      const viewer = document.getElementById('ar-viewer');
+      const item = products[key];
 
-    <script>
-      const viewer = document.getElementById("main-viewer");
-
-      // Menü Veritabanı
-      const menuItems = [
-        {
-          id: "urun2",
-          category: "pizza",
-          title: "Karışık İtalyan Pizza",
-          desc: "Mozzarella, mantar, biber, sucuk ve özel fesleğenli domates sosu.",
-          price: "320 ₺",
-          glb: "assets/urun2.glb",
-          usdz: "assets/urun2.usdz",
-          orient: "0deg 0deg 0deg",
-        },
-        {
-          id: "urun1",
-          category: "burger",
-          title: "Double Smash Burger",
-          desc: "180g dana köfte, eritilmiş cheddar, karamelize soğan ve füme sos.",
-          price: "280 ₺",
-          glb: "assets/urun1.glb",
-          usdz: "assets/urun1.usdz",
-          orient: "0deg 0deg 0deg",
-        },
-        {
-          id: "urun3",
-          category: "makarna",
-          title: "Penne Arrabbiata",
-          desc: "Acılı İtalyan domates sosu, taze fesleğen, sarımsak ve rendelenmiş parmesan.",
-          price: "240 ₺",
-          glb: "assets/urun3.glb",
-          usdz: "assets/urun3.usdz",
-          orient: "0deg 0deg 0deg",
-        },
-        {
-          id: "koltukT",
-          category: "mobilya",
-          title: "Modern Koltuk Takımı",
-          desc: "Ergonomik tasarım, dokuma kumaş kaplama ve konforlu oturma alanı.",
-          price: "18.500 ₺",
-          glb: "assets/koltukT.glb",
-          usdz: "assets/koltukT.usdz",
-          orient: "0deg 0deg 0deg",
-        },
-      ];
-
-      let activeItem = menuItems[0];
-
-      function renderList(cat = "all") {
-        const container = document.getElementById("items-container");
-        container.innerHTML = "";
-
-        const filtered =
-          cat === "all"
-            ? menuItems
-            : menuItems.filter((item) => item.category === cat);
-
-        filtered.forEach((item) => {
-          const div = document.createElement("div");
-          div.className = `menu-item ${item.id === activeItem.id ? "active" : ""}`;
-          div.onclick = () => selectItem(item, div);
-
-          div.innerHTML = `
-          <div class="item-text">
-            <h4>${item.title}</h4>
-            <span>${item.desc.substring(0, 38)}...</span>
-          </div>
-          <div class="item-price">${item.price}</div>
-        `;
-          container.appendChild(div);
-        });
+      viewer.src = item.glb;
+      if (item.usdz) {
+        viewer.setAttribute('ios-src', item.usdz);
+      } else {
+        viewer.removeAttribute('ios-src');
       }
 
-      function selectItem(item, element) {
-        activeItem = item;
+      viewer.setAttribute('ar-placement', 'floor');
+      viewer.removeAttribute('camera-target');
+      viewer.removeAttribute('orientation');
 
-        viewer.setAttribute("src", item.glb);
-        viewer.setAttribute("ios-src", item.usdz);
-        viewer.setAttribute("orientation", item.orient);
-        viewer.cameraOrbit = "0deg 75deg 105%";
+      document.getElementById('product-title').innerText = item.title;
+      document.getElementById('product-dimensions').innerText = item.dimensions;
+      document.getElementById('product-desc').innerText = item.desc;
 
-        document.getElementById("title-display").innerText = item.title;
-        document.getElementById("desc-display").innerText = item.desc;
-        document.getElementById("price-display").innerText = item.price;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
 
-        document
-          .querySelectorAll(".menu-item")
-          .forEach((el) => el.classList.remove("active"));
-        if (element) {
-          element.classList.add("active");
-        }
-      }
+    function startAR() {
+      const viewer = document.getElementById('ar-viewer');
+      const item = products[currentProduct];
+      const isIOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.MSStream;
 
-      // iPhone/iOS için Apple Quick Look, Android için WebXR tetikleme
-      function handleARLaunch() {
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-        if (isIOS) {
-          const anchor = document.createElement("a");
-          anchor.setAttribute("rel", "ar");
-          anchor.setAttribute("href", activeItem.usdz);
-          const img = document.createElement("img");
-          anchor.appendChild(img);
-          document.body.appendChild(anchor);
-          anchor.click();
-          anchor.remove();
-          return;
-        }
-
+      if (viewer.canActivateAR) {
         viewer.activateAR();
+        return;
       }
 
-      function filterCategory(cat, btn) {
-        document
-          .querySelectorAll(".cat-btn")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        renderList(cat);
+      if (isIOS && item.usdz) {
+        const fullUsdzUrl = new URL(item.usdz, window.location.href).href;
+        const anchor = document.createElement('a');
+        anchor.setAttribute('rel', 'ar');
+        anchor.appendChild(document.createElement('img'));
+        anchor.setAttribute('href', `${fullUsdzUrl}#allowsContentScaling=1`);
+        anchor.click();
+        return;
       }
 
-      window.addEventListener("DOMContentLoaded", () => {
-        renderList("all");
-      });
-    </script>
-  </body>
+      if (/android/i.test(navigator.userAgent)) {
+        const fullGlbUrl = new URL(item.glb, window.location.href).href;
+        const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&plane_type=floor&enable_horizontal_drag=true#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+        window.location.href = intentUrl;
+        return;
+      }
+
+      alert("AR deneyimi mobil cihazlar içindir. Lütfen telefonunuzdan açın!");
+    }
+  </script>
+</body>
 </html>

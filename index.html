@@ -1,155 +1,231 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Mobilya AR Kataloğu</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Mobilya AR Kataloğu</title>
 
-  <!-- Google Model Viewer -->
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <!-- Google Model Viewer -->
+    <script
+      type="module"
+      src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"
+    ></script>
 
-  <!-- Harici CSS -->
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <!-- Harici CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="badge">Artırılmış Gerçeklik</div>
+      <h1>Mobilya Stüdyosu</h1>
+      <p>Modeli inceleyin veya kamerayla mekanınıza yerleştirin.</p>
+    </header>
 
-  <header>
-    <div class="badge">Artırılmış Gerçeklik</div>
-    <h1>Mobilya Stüdyosu</h1>
-    <p>Modeli inceleyin veya kamerayla mekanınıza yerleştirin.</p>
-  </header>
+    <main class="main-container">
+      <!-- 3D Sahne Konteyneri -->
+      <div class="viewer-wrapper">
+        <!-- Sağ Üstte Konumlandırılmış Minimal AR Butonu -->
+        <button type="button" id="ar-launch-button" aria-label="Mekanda Gör">
+          <svg viewBox="0 0 24 24" class="ar-icon">
+            <path
+              d="M4 4h3V2H4a2 2 0 0 0-2 2v3h2V4zm16-2h-3v2h3v3h2V4a2 2 0 0 0-2-2zm-1 18h-3v2h3a2 2 0 0 0 2-2v-3h-2v3zM4 17H2v3a2 2 0 0 0 2 2h3v-2H4v-3zm8-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
+            />
+          </svg>
+          <span class="ar-label">AR'da Gör</span>
+        </button>
 
-  <div class="main-container">
-    <div class="viewer-wrapper">
-      <model-viewer
-        id="ar-viewer"
-        src="models/koltuk.glb"
-        ios-src="models/koltuk.usdz"
-        alt="Mobilya Modeli"
-        ar
-        ar-modes="webxr scene-viewer quick-look"
-        ar-scale="auto"
-        ar-placement="floor"
-        camera-controls
-        touch-action="pan-y"
-        shadow-intensity="1.4"
-        shadow-softness="1"
-        exposure="1.05"
-        auto-rotate>
-      </model-viewer>
+        <!-- Yükleniyor Göstergesi (Loader & Progress) -->
+        <div id="loader" class="loader-overlay active">
+          <div class="spinner"></div>
+          <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+          </div>
+          <span id="loader-text">Model Yükleniyor...</span>
+        </div>
 
-      <!-- Sağ Altta Kompakt Kamera Butonu -->
-      <button type="button" id="custom-ar-button" onclick="startAR()" title="Kamerada Gör">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 9a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm0 6a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5z"/>
-          <path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm11 16H4V7h3.83l1.83-2h4.68l1.83 2H20v12z"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="controls-card">
-      <div class="product-tabs">
-        <button class="tab-btn active" onclick="selectProduct('koltuk')">Berjer</button>
-        <button class="tab-btn" onclick="selectProduct('koltukT')">Koltuk Takımı</button>
-        <button class="tab-btn" onclick="selectProduct('lamba')">Lamba</button>
-        <button class="tab-btn" onclick="selectProduct('masa')">Masa</button>
+        <!-- Optimize Edilmiş Model Viewer -->
+        <model-viewer
+          id="ar-viewer"
+          src="models/koltuk.glb"
+          ios-src="models/koltuk.usdz"
+          alt="Mobilya 3D Modeli"
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          ar-scale="auto"
+          ar-placement="floor"
+          camera-controls
+          touch-action="pan-y"
+          shadow-intensity="0.8"
+          shadow-softness="0.5"
+          exposure="1"
+          loading="lazy"
+          reveal="auto"
+          power-preference="high-performance"
+        >
+        </model-viewer>
       </div>
 
-      <div class="product-info">
-        <h2 id="product-title">Tekli Berjer Koltuk</h2>
-        <div class="dimensions-pill" id="product-dimensions">85 × 90 × 95 cm</div>
-        <p class="description" id="product-desc">Odanızda kaplayacağı alanı görmek için sağ alttaki kamera butonuna dokunun. Tek parmağınızla serbestçe sürükleyip taşıyabilirsiniz.</p>
-      </div>
-    </div>
-  </div>
+      <!-- Ürün Kontrol & Detay Paneli -->
+      <section class="controls-card">
+        <nav class="product-tabs" role="tablist">
+          <button class="tab-btn active" data-product="koltuk">Berjer</button>
+          <button class="tab-btn" data-product="koltukT">Koltuk T.</button>
+          <button class="tab-btn" data-product="lamba">Lamba</button>
+          <button class="tab-btn" data-product="masa">Masa</button>
+        </nav>
 
-  <script>
-    const products = {
-      koltuk: {
-        title: "Tekli Berjer Koltuk",
-        dimensions: "85 × 90 × 95 cm",
-        desc: "Zemine oturtup parmağınızla odada istediğiniz köşeye sürükleyebilirsiniz.",
-        glb: "models/koltuk.glb",
-        usdz: "models/koltuk.usdz"
-      },
-      koltukT: {
-        title: "Modüler Koltuk Takımı",
-        dimensions: "230 × 95 × 85 cm",
-        desc: "Salonunuzun zeminine tam oturur. Kaplayacağı gerçek hacmi ve yürüyüş payını test edin.",
-        glb: "models/koltukT.glb",
-        usdz: "models/koltukT.usdz"
-      },
-      lamba: {
-        title: "Modern Lamba",
-        dimensions: "40 × 40 × 120 cm",
-        desc: "Doğru dik açısıyla yerleşir. Tek parmağınızla tutup odanın her yerine rahatça sürükleyebilirsiniz.",
-        glb: "models/lamba.glb",
-        usdz: "models/lamba.usdz"
-      },
-      masa: {
-        title: "Masif Yemek Masası",
-        dimensions: "160 × 90 × 76 cm",
-        desc: "Zemine oturtup sürükleyebilir, etrafında yürüyerek ölçülerini test edebilirsiniz.",
-        glb: "models/masa.glb",
-        usdz: "models/masa.usdz"
+        <article class="product-info">
+          <h2 id="product-title">Tekli Berjer Koltuk</h2>
+          <div class="dimensions-pill" id="product-dimensions">
+            85 × 90 × 95 cm
+          </div>
+          <p class="description" id="product-desc">
+            Odanızda kaplayacağı alanı görmek için sağ üstteki AR butonuna
+            dokunun. Tek parmağınızla serbestçe sürükleyip taşıyabilirsiniz.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      // Ürün Kataloğu Veri Konfigürasyonu
+      const PRODUCT_CATALOG = {
+        koltuk: {
+          title: "Tekli Berjer Koltuk",
+          dimensions: "85 × 90 × 95 cm",
+          desc: "Zemine oturtup parmağınızla odada istediğiniz köşeye sürükleyebilirsiniz.",
+          glb: "models/koltuk.glb",
+          usdz: "models/koltuk.usdz",
+        },
+        koltukT: {
+          title: "Modüler Koltuk Takımı",
+          dimensions: "230 × 95 × 85 cm",
+          desc: "Salonunuzun zeminine tam oturur. Kaplayacağı gerçek hacmi ve yürüyüş payını test edin.",
+          glb: "models/koltukT.glb",
+          usdz: "models/koltukT.usdz",
+        },
+        lamba: {
+          title: "Modern Lamba",
+          dimensions: "40 × 40 × 120 cm",
+          desc: "Doğru dik açısıyla yerleşir. Tek parmağınızla tutup odanın her yerine rahatça sürükleyebilirsiniz.",
+          glb: "models/lamba.glb",
+          usdz: "models/lamba.usdz",
+        },
+        masa: {
+          title: "Masif Yemek Masası",
+          dimensions: "160 × 90 × 76 cm",
+          desc: "Zemine oturtup sürükleyebilir, etrafında yürüyerek ölçülerini test edebilirsiniz.",
+          glb: "models/masa.glb",
+          usdz: "models/masa.usdz",
+        },
+      };
+
+      // State Yönetimi
+      let activeKey = "koltuk";
+      let isSwitching = false;
+
+      // DOM Referansları
+      const viewer = document.getElementById("ar-viewer");
+      const launchBtn = document.getElementById("ar-launch-button");
+      const loader = document.getElementById("loader");
+      const progressBar = document.getElementById("progress-bar");
+      const loaderText = document.getElementById("loader-text");
+      const titleEl = document.getElementById("product-title");
+      const dimsEl = document.getElementById("product-dimensions");
+      const descEl = document.getElementById("product-desc");
+      const tabs = document.querySelectorAll(".tab-btn");
+
+      // Model Yükleme İlerlemesi (Network Takibi)
+      viewer.addEventListener("progress", (e) => {
+        const percentage = Math.round(e.detail.totalProgress * 100);
+        progressBar.style.width = `${percentage}%`;
+        loaderText.innerText = `%${percentage} Yüklendi`;
+      });
+
+      // Model Tam Yüklendiğinde
+      viewer.addEventListener("load", () => {
+        loader.classList.remove("active");
+        progressBar.style.width = "0%";
+        isSwitching = false;
+      });
+
+      // Model Değiştirme Fonksiyonu
+      function switchProduct(key) {
+        if (key === activeKey || isSwitching) return;
+        isSwitching = true;
+        activeKey = key;
+
+        const item = PRODUCT_CATALOG[key];
+
+        // Loader'ı aktif et
+        loader.classList.add("active");
+        loaderText.innerText = "Yükleniyor...";
+
+        // Model kaynaklarını güncelle
+        viewer.src = item.glb;
+        if (item.usdz) {
+          viewer.setAttribute("ios-src", item.usdz);
+        } else {
+          viewer.removeAttribute("ios-src");
+        }
+
+        // UI Metinlerini Güncelle
+        titleEl.innerText = item.title;
+        dimsEl.innerText = item.dimensions;
+        descEl.innerText = item.desc;
+
+        // Sekmeleri Güncelle
+        tabs.forEach((tab) => {
+          tab.classList.toggle("active", tab.dataset.product === key);
+        });
       }
-    };
 
-    let currentProduct = 'koltuk';
+      // Sekme Dinleyicileri (Event Delegation)
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", (e) => {
+          const productKey = e.currentTarget.dataset.product;
+          switchProduct(productKey);
+        });
+      });
 
-    function selectProduct(key) {
-      currentProduct = key;
-      const viewer = document.getElementById('ar-viewer');
-      const item = products[key];
+      // Evrensel AR Başlatıcı (iOS QuickLook & Android Scene Viewer)
+      launchBtn.addEventListener("click", () => {
+        const item = PRODUCT_CATALOG[activeKey];
+        const isIOS =
+          (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" &&
+              navigator.maxTouchPoints > 1)) &&
+          !window.MSStream;
 
-      viewer.src = item.glb;
-      if (item.usdz) {
-        viewer.setAttribute('ios-src', item.usdz);
-      } else {
-        viewer.removeAttribute('ios-src');
-      }
+        if (viewer.canActivateAR) {
+          viewer.activateAR();
+          return;
+        }
 
-      viewer.setAttribute('ar-placement', 'floor');
-      viewer.removeAttribute('camera-target');
-      viewer.removeAttribute('orientation');
+        if (isIOS && item.usdz) {
+          const fullUsdzUrl = new URL(item.usdz, window.location.href).href;
+          const anchor = document.createElement("a");
+          anchor.setAttribute("rel", "ar");
+          anchor.appendChild(document.createElement("img"));
+          anchor.setAttribute("href", `${fullUsdzUrl}#allowsContentScaling=1`);
+          anchor.click();
+          return;
+        }
 
-      document.getElementById('product-title').innerText = item.title;
-      document.getElementById('product-dimensions').innerText = item.dimensions;
-      document.getElementById('product-desc').innerText = item.desc;
+        if (/android/i.test(navigator.userAgent)) {
+          const fullGlbUrl = new URL(item.glb, window.location.href).href;
+          const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&plane_type=floor&enable_horizontal_drag=true#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+          window.location.href = intentUrl;
+          return;
+        }
 
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-    }
-
-    function startAR() {
-      const viewer = document.getElementById('ar-viewer');
-      const item = products[currentProduct];
-      const isIOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.MSStream;
-
-      if (viewer.canActivateAR) {
-        viewer.activateAR();
-        return;
-      }
-
-      if (isIOS && item.usdz) {
-        const fullUsdzUrl = new URL(item.usdz, window.location.href).href;
-        const anchor = document.createElement('a');
-        anchor.setAttribute('rel', 'ar');
-        anchor.appendChild(document.createElement('img'));
-        anchor.setAttribute('href', `${fullUsdzUrl}#allowsContentScaling=1`);
-        anchor.click();
-        return;
-      }
-
-      if (/android/i.test(navigator.userAgent)) {
-        const fullGlbUrl = new URL(item.glb, window.location.href).href;
-        const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullGlbUrl)}&mode=ar_only&plane_type=floor&enable_horizontal_drag=true#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
-        window.location.href = intentUrl;
-        return;
-      }
-
-      alert("AR deneyimi mobil cihazlar içindir. Lütfen telefonunuzdan açın!");
-    }
-  </script>
-</body>
+        alert(
+          "AR deneyimi mobil cihazlar içindir. Lütfen sayfayı telefonunuzdan açın.",
+        );
+      });
+    </script>
+  </body>
 </html>

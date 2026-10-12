@@ -1,6 +1,6 @@
 :root {
   --bg-primary: #0e0f12;
-  --bg-surface: rgba(20, 22, 28, 0.72);
+  --bg-surface: rgba(20, 22, 28, 0.75);
   --card-border: rgba(255, 255, 255, 0.08);
   --text-main: #fcfcfc;
   --text-muted: #8e94a0;
@@ -76,11 +76,11 @@ header h1 {
   gap: 1rem;
 }
 
-/* Genişletilmiş ve Derinlikli 3D Sahne */
+/* Genişletilmiş 3D Sahne */
 .viewer-wrapper {
   position: relative;
   width: 100%;
-  height: 64vh; /* Ekranın büyük kısmını kaplayan dev alan */
+  height: 64vh;
   border-radius: var(--radius-xl);
   background: radial-gradient(circle at 50% 40%, #1f222b 0%, #101217 90%);
   border: 1px solid var(--card-border);
@@ -96,7 +96,10 @@ model-viewer {
   --poster-color: transparent;
 }
 
-/* Akıcı Yükleme Çizgisi */
+model-viewer::part(default-progress-bar) {
+  display: none;
+}
+
 .loader-line {
   position: absolute;
   top: 0;
@@ -148,7 +151,7 @@ model-viewer {
   fill: currentColor;
 }
 
-/* Sol Alt Segmented Glass Pill (Dolu / X-Ray) */
+/* Sol Alt X-Ray Seçici */
 .view-mode-pill {
   position: absolute;
   bottom: 16px;
@@ -182,7 +185,7 @@ model-viewer {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Alt Kontrol Kartı */
+/* Kontrol Kartı */
 .controls-card {
   background: var(--bg-surface);
   backdrop-filter: blur(24px);

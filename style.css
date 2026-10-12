@@ -1,49 +1,255 @@
-/* Sağ Üstteki İkili Kontrol Barı */
-.top-action-bar {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 15;
+:root {
+  --bg-primary: #0e0f12;
+  --bg-surface: rgba(20, 22, 28, 0.72);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-main: #fcfcfc;
+  --text-muted: #8e94a0;
+  --accent-gold: #e5ded2;
+  --radius-xl: 32px;
+  --radius-md: 18px;
+  --radius-sm: 10px;
 }
 
-#mode-toggle-button,
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI",
+    sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(55, 58, 68, 0.28) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(25, 28, 35, 0.4) 0%,
+      transparent 65%
+    );
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+header {
+  width: 100%;
+  max-width: 520px;
+  padding: 1.4rem 1.25rem 0.6rem;
+  text-align: center;
+}
+
+.brand-tag {
+  display: inline-block;
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  background: rgba(229, 222, 210, 0.06);
+  border: 1px solid rgba(229, 222, 210, 0.14);
+  padding: 3px 12px;
+  border-radius: 999px;
+  margin-bottom: 0.4rem;
+}
+
+header h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.main-container {
+  width: 100%;
+  max-width: 520px;
+  padding: 0 1rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Genişletilmiş ve Derinlikli 3D Sahne */
+.viewer-wrapper {
+  position: relative;
+  width: 100%;
+  height: 64vh; /* Ekranın büyük kısmını kaplayan dev alan */
+  border-radius: var(--radius-xl);
+  background: radial-gradient(circle at 50% 40%, #1f222b 0%, #101217 90%);
+  border: 1px solid var(--card-border);
+  box-shadow:
+    0 20px 50px -10px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+model-viewer {
+  width: 100%;
+  height: 100%;
+  --poster-color: transparent;
+}
+
+/* Akıcı Yükleme Çizgisi */
+.loader-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-gold), #ffffff);
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    width 0.2s ease,
+    opacity 0.3s ease;
+}
+
+/* Sağ Üst AR Butonu */
 #ar-launch-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(24, 26, 32, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--warm-accent);
-  padding: 8px 13px;
+  gap: 7px;
+  background: rgba(28, 30, 38, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--accent-gold);
+  padding: 9px 15px;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 15;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  font-size: 0.8rem;
+  font-weight: 600;
   transition:
     transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
-    background-color 0.2s ease,
-    border-color 0.2s ease;
-  font-size: 0.78rem;
-  font-weight: 600;
+    background-color 0.2s ease;
 }
 
-#mode-toggle-button.active-mode {
-  background: rgba(236, 231, 225, 0.2);
-  border-color: var(--warm-accent);
+#ar-launch-button:active {
+  transform: scale(0.93);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.ar-icon {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+
+/* Sol Alt Segmented Glass Pill (Dolu / X-Ray) */
+.view-mode-pill {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  background: rgba(18, 20, 26, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px;
+  border-radius: 999px;
+  z-index: 15;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.mode-opt {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-opt.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Alt Kontrol Kartı */
+.controls-card {
+  background: var(--bg-surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem 1.3rem;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.product-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: rgba(12, 13, 16, 0.45);
+  padding: 5px;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.tab-btn {
+  padding: 9px 4px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 0.35rem;
+}
+
+.product-info h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
   color: #ffffff;
 }
 
-#mode-toggle-button:active,
-#ar-launch-button:active {
-  transform: scale(0.93);
+.dimensions-pill {
+  font-size: 0.72rem;
+  color: var(--accent-gold);
+  background: rgba(229, 222, 210, 0.08);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
 }
 
-.action-icon {
-  width: 15px;
-  height: 15px;
-  fill: currentColor;
+.product-info .description {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
 }

@@ -14,7 +14,8 @@
       src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"
     ></script>
 
-    <!-- Hafif Asset Prefetch -->
+    <!-- Preconnect & Prefetch ile Hızlı Yükleme -->
+    <link rel="preconnect" href="https://ajax.googleapis.com" />
     <link rel="prefetch" href="models/koltuk.glb" />
     <link rel="prefetch" href="models/koltukT.glb" />
 
@@ -23,48 +24,52 @@
   </head>
   <body>
     <header>
-      <div class="badge">Artırılmış Gerçeklik</div>
-      <h1>Mobilya Stüdyosu</h1>
-      <p>Modeli inceleyin veya mekanınızda deneyin.</p>
+      <div class="brand-tag">3D STUDIO & AR PROVA</div>
+      <h1>Özel Tasarım Mobilya</h1>
     </header>
 
     <main class="main-container">
+      <!-- Genişletilmiş ve Derinlikli 3D Sahnesi -->
       <div class="viewer-wrapper">
-        <!-- Üst İnce Yükleme Çizgisi -->
+        <!-- Hızlı Yükleme Çizgisi -->
         <div id="loader-line" class="loader-line"></div>
 
-        <!-- Sağ Üst Buton Grubu: Mod Değiştirici & AR Başlatıcı -->
-        <div class="top-action-bar">
-          <button
-            type="button"
-            id="mode-toggle-button"
-            onclick="toggleGhostMode()"
-            title="Görünüm Modu Değiştir"
-          >
-            <svg viewBox="0 0 24 24" class="action-icon">
-              <path
-                d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-              />
-            </svg>
-            <span id="mode-text">Dolu</span>
-          </button>
+        <!-- Sağ Üst: Şık AR Butonu -->
+        <button
+          type="button"
+          id="ar-launch-button"
+          onclick="startAR()"
+          title="Mekanda Gör"
+        >
+          <svg viewBox="0 0 24 24" class="ar-icon">
+            <path
+              d="M4 4h3V2H4a2 2 0 0 0-2 2v3h2V4zm16-2h-3v2h3v3h2V4a2 2 0 0 0-2-2zm-1 18h-3v2h3a2 2 0 0 0 2-2v-3h-2v3zM4 17H2v3a2 2 0 0 0 2 2h3v-2H4v-3zm8-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
+            />
+          </svg>
+          <span>AR'da Gör</span>
+        </button>
 
+        <!-- Sol Alt: Ultra Estetik Segmented Mod Seçici (Dolu / X-Ray) -->
+        <div class="view-mode-pill">
           <button
             type="button"
-            id="ar-launch-button"
-            onclick="startAR()"
-            title="Mekanda Gör"
+            class="mode-opt active"
+            id="mode-solid"
+            onclick="setGhostMode(false)"
           >
-            <svg viewBox="0 0 24 24" class="action-icon">
-              <path
-                d="M4 4h3V2H4a2 2 0 0 0-2 2v3h2V4zm16-2h-3v2h3v3h2V4a2 2 0 0 0-2-2zm-1 18h-3v2h3a2 2 0 0 0 2-2v-3h-2v3zM4 17H2v3a2 2 0 0 0 2 2h3v-2H4v-3zm8-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
-              />
-            </svg>
-            <span>AR'da Gör</span>
+            Dolu
+          </button>
+          <button
+            type="button"
+            class="mode-opt"
+            id="mode-ghost"
+            onclick="setGhostMode(true)"
+          >
+            X-Ray
           </button>
         </div>
 
-        <!-- 3D Model Sahnesi -->
+        <!-- Yüksek Performanslı ve Genişletilmiş Model Viewer -->
         <model-viewer
           id="ar-viewer"
           src="models/koltuk.glb"
@@ -75,17 +80,20 @@
           ar-scale="auto"
           ar-placement="floor"
           camera-controls
+          camera-orbit="0deg 75deg 105%"
+          field-of-view="32deg"
           touch-action="pan-y"
-          shadow-intensity="0.8"
-          shadow-softness="0.4"
-          exposure="1"
+          shadow-intensity="1.2"
+          shadow-softness="0.6"
+          exposure="1.1"
           loading="eager"
           reveal="auto"
+          power-preference="high-performance"
         >
         </model-viewer>
       </div>
 
-      <!-- Ürün Kontrol Paneli -->
+      <!-- Alt Kontrol & Ürün Bilgisi -->
       <section class="controls-card">
         <nav class="product-tabs">
           <button class="tab-btn active" onclick="selectProduct('koltuk')">
@@ -101,14 +109,16 @@
         </nav>
 
         <article class="product-info">
-          <h2 id="product-title">Tekli Berjer Koltuk</h2>
-          <div class="dimensions-pill" id="product-dimensions">
-            85 × 90 × 95 cm
+          <div class="info-header">
+            <h2 id="product-title">Tekli Berjer Koltuk</h2>
+            <span class="dimensions-pill" id="product-dimensions"
+              >85 × 90 × 95 cm</span
+            >
           </div>
           <p class="description" id="product-desc">
-            Odanızda kaplayacağı hacmi test edin. Sağ üstteki göz butonuyla yarı
-            saydam hayalet moduna alabilir, mevcut eşyalarınızın üzerine oturtup
-            sınırları görebilirsiniz.
+            Odanızda kaplayacağı alanı birebir görmek için sağ üstteki AR
+            butonuna dokunun. Sol alttaki X-Ray modu ile iskelet sınırlarını
+            inceleyebilirsiniz.
           </p>
         </article>
       </section>
@@ -119,39 +129,41 @@
         koltuk: {
           title: "Tekli Berjer Koltuk",
           dimensions: "85 × 90 × 95 cm",
-          desc: "Zemine oturtup parmağınızla odada istediğiniz köşeye sürükleyebilirsiniz.",
+          desc: "Zemine oturtup parmağınızla odada istediğiniz köşeye serbestçe sürükleyebilirsiniz.",
           glb: "models/koltuk.glb",
           usdz: "models/koltuk.usdz",
+          cameraOrbit: "0deg 75deg 105%",
         },
         koltukT: {
           title: "Modüler Koltuk Takımı",
           dimensions: "230 × 95 × 85 cm",
-          desc: "Salonunuzun zeminine tam oturur. Göz butonuna basarak yarı saydam moda alıp arkasındaki eşyalarla hizalayabilirsiniz.",
+          desc: "Geniş hacimli salonlar için birebir ölçekli yerleşim. X-Ray moduyla arkasındaki alanı görebilirsiniz.",
           glb: "models/koltukT.glb",
           usdz: "models/koltukT.usdz",
+          cameraOrbit: "25deg 70deg 110%",
         },
         lamba: {
           title: "Modern Lamba",
           dimensions: "40 × 40 × 120 cm",
-          desc: "Doğru dik açısıyla yerleşir. Tek parmağınızla tutup odanın her yerine rahatça sürükleyebilirsiniz.",
+          desc: "Dik duruşuyla köşe aydınlatması için optimize edilmiş model.",
           glb: "models/lamba.glb",
           usdz: "models/lamba.usdz",
+          cameraOrbit: "0deg 80deg 115%",
         },
         masa: {
           title: "Masif Yemek Masası",
           dimensions: "160 × 90 × 76 cm",
-          desc: "Zemine oturtup sürükleyebilir, etrafında yürüyerek ölçülerini test edebilirsiniz.",
+          desc: "Zemine oturtup etrafında yürüyerek sandalyeler için kalan boşluğu test edin.",
           glb: "models/masa.glb",
           usdz: "models/masa.usdz",
+          cameraOrbit: "35deg 65deg 108%",
         },
       };
 
       let currentProduct = "koltuk";
-      let isGhostMode = false;
+      let isGhostActive = false;
       const viewer = document.getElementById("ar-viewer");
       const loaderLine = document.getElementById("loader-line");
-      const modeText = document.getElementById("mode-text");
-      const modeBtn = document.getElementById("mode-toggle-button");
 
       viewer.addEventListener("progress", (e) => {
         const progress = e.detail.totalProgress;
@@ -164,34 +176,32 @@
         setTimeout(() => {
           loaderLine.style.opacity = "0";
           loaderLine.style.width = "0%";
-        }, 250);
+        }, 200);
 
-        // Model değiştiğinde aktif mod açıksa materyallere uygula
-        if (isGhostMode) {
-          applyGhostMode(true);
-        }
+        if (isGhostActive) applyGhostMode(true);
       });
 
-      // Saydamlık / Hayalet İskelet Modu Fonksiyonu
-      function toggleGhostMode() {
-        isGhostMode = !isGhostMode;
-        applyGhostMode(isGhostMode);
+      // Segmented X-Ray Modu Yönetimi
+      function setGhostMode(enable) {
+        isGhostActive = enable;
+        applyGhostMode(enable);
 
-        modeText.innerText = isGhostMode ? "Saydam" : "Dolu";
-        modeBtn.classList.toggle("active-mode", isGhostMode);
+        document
+          .getElementById("mode-solid")
+          .classList.toggle("active", !enable);
+        document
+          .getElementById("mode-ghost")
+          .classList.toggle("active", enable);
       }
 
       function applyGhostMode(enable) {
         if (!viewer.model || !viewer.model.materials) return;
 
-        const materials = viewer.model.materials;
-        materials.forEach((mat) => {
+        viewer.model.materials.forEach((mat) => {
           if (enable) {
-            // Saydam mod: Opaklığı %35'e düşür, sınırları belirgin tut
-            mat.pbrMetallicRoughness.setBaseColorFactor([1.0, 1.0, 1.0, 0.35]);
+            mat.pbrMetallicRoughness.setBaseColorFactor([0.9, 0.9, 0.95, 0.35]);
             if (mat.setAlphaMode) mat.setAlphaMode("BLEND");
           } else {
-            // Dolu mod: Orijinal opaklığa dön
             mat.pbrMetallicRoughness.setBaseColorFactor([1.0, 1.0, 1.0, 1.0]);
             if (mat.setAlphaMode) mat.setAlphaMode("OPAQUE");
           }
@@ -204,13 +214,17 @@
         const item = products[key];
 
         loaderLine.style.opacity = "1";
-        loaderLine.style.width = "20%";
+        loaderLine.style.width = "25%";
 
         viewer.src = item.glb;
         if (item.usdz) {
           viewer.setAttribute("ios-src", item.usdz);
         } else {
           viewer.removeAttribute("ios-src");
+        }
+
+        if (item.cameraOrbit) {
+          viewer.cameraOrbit = item.cameraOrbit;
         }
 
         document.getElementById("product-title").innerText = item.title;

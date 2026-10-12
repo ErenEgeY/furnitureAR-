@@ -14,10 +14,10 @@
       src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"
     ></script>
 
-    <!-- Harici Stil Dosyası (Önbellek kilidini kıran versiyonlu) -->
-    <link rel="stylesheet" href="style.css?v=3" />
+    <!-- Harici Stil Dosyası -->
+    <link rel="stylesheet" href="style.css?v=4" />
 
-    <!-- Hızlı Ağ Bağlantıları -->
+    <!-- Hızlı CDN Bağlantısı -->
     <link rel="preconnect" href="https://ajax.googleapis.com" />
   </head>
   <body>
@@ -28,7 +28,7 @@
 
     <main class="main-container">
       <div class="viewer-wrapper">
-        <!-- Akıcı Üst Yükleme Çizgisi -->
+        <!-- Üst Yükleme Çizgisi -->
         <div id="loader-line" class="loader-line"></div>
 
         <!-- Sağ Üst Donanımsal AR Butonu -->
@@ -66,11 +66,10 @@
           </button>
         </div>
 
-        <!-- Genişletilmiş 3D Sahne -->
+        <!-- Sadece GLB Yükleyen Ultra Hafif 3D Sahne (ios-src önden yüklenmez) -->
         <model-viewer
           id="ar-viewer"
           src="models/koltuk.glb"
-          ios-src="models/koltuk.usdz"
           alt="Mobilya 3D Modeli"
           ar
           ar-modes="quick-look scene-viewer webxr"
@@ -162,7 +161,7 @@
       const viewer = document.getElementById("ar-viewer");
       const loaderLine = document.getElementById("loader-line");
 
-      // Yükleme Çizgisi Takibi
+      // Model Yükleme İlerlemesi (Yalnızca GLB takip edilir)
       viewer.addEventListener("progress", (e) => {
         const progress = e.detail.totalProgress;
         loaderLine.style.opacity = "1";
@@ -206,7 +205,7 @@
         });
       }
 
-      // Ürün Değiştirme
+      // Ürün Değiştirme (Sadece GLB çeker, ağ trafiğini yormaz)
       function selectProduct(key) {
         if (key === currentProduct) return;
         currentProduct = key;
@@ -216,11 +215,7 @@
         loaderLine.style.width = "25%";
 
         viewer.src = item.glb;
-        if (item.usdz) {
-          viewer.setAttribute("ios-src", item.usdz);
-        } else {
-          viewer.removeAttribute("ios-src");
-        }
+        // ios-src bilerek atanmıyor; iPhone sadece butona bastığında çekecek!
 
         if (item.cameraOrbit) {
           viewer.cameraOrbit = item.cameraOrbit;
@@ -237,8 +232,22 @@
         event.target.classList.add("active");
       }
 
-      // Donanımsal Hızlı AR Başlatıcı
+      // İstek Doğrultusunda AR Başlatma (On-Demand AR Activation)
       function startAR() {
+        const item = products[currentProduct];
+        const isIOS =
+          (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" &&
+              navigator.maxTouchPoints > 1)) &&
+          !window.MSStream;
+
+        if (isIOS) {
+          // iPhone ise SADECE ŞİMDİ ios-src'yi bağla ve kamerayı aç
+          if (item.usdz) {
+            viewer.setAttribute("ios-src", item.usdz);
+          }
+        }
+
         if (typeof viewer.activateAR === "function") {
           viewer.activateAR();
         } else {
